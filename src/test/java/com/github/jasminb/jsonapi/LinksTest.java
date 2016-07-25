@@ -1,6 +1,5 @@
 package com.github.jasminb.jsonapi;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.github.jasminb.jsonapi.annotations.Id;
 import com.github.jasminb.jsonapi.annotations.Type;
@@ -80,6 +79,19 @@ public class LinksTest {
 
         public void setId(String id) {
             this.id = id;
+        }
+
+    }
+
+    private static class MetaData{
+        private String owner = "Strongbad";
+
+        public String getOwner() {
+            return owner;
+        }
+
+        public void setOwner(String owner) {
+            this.owner = owner;
         }
 
     }
