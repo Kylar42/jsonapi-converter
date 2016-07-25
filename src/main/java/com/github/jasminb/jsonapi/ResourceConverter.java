@@ -538,7 +538,41 @@ public class ResourceConverter {
 		if (resourceId != null) {
 			dataNode.put(ID, resourceId);
 		}
+
+
+		//Remove Links node from attributes
+		Field linksField = configuration.getLinksField(object.getClass());
+		if(linksField != null){
+			ObjectNode linksNode = objectMapper.createObjectNode();
+			com.github.jasminb.jsonapi.Links linkObject = (com.github.jasminb.jsonapi.Links)linksField.get(object);
+			for(Map.Entry<String, Link> linkEntry : linkObject.getLinks().entrySet()){
+				Link link = linkEntry.getValue();
+				if(!link.getMeta().isEmpty()){
+					//write complex link
+					ObjectNode linkHolderNode = objectMapper.createObjectNode();
+					linkHolderNode.put(HREF, link.getHref());
+					String meta = null;
+
+					try {
+						meta = objectMapper.writer().writeValueAsString(link.getMeta());
+					} catch (JsonProcessingException e) {
+						e.printStackTrace();
+					}
+
+					linkHolderNode.put(META, meta);
+					linksNode.set(linkEntry.getKey(), linkHolderNode);
+				}else {
+					linksNode.put(linkEntry.getKey(), linkEntry.getValue().getHref());
+				}
+			}
+
+			dataNode.set(LINKS, linksNode);
+			attributesNode.remove(linksField.getName());
+		}
+
 		dataNode.set(ATTRIBUTES, attributesNode);
+
+
 
 
 		// Handle relationships (remove from base type and add as relationships)
